@@ -4,6 +4,7 @@ using System;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using System.Text;
 
 public class GameLobby : MonoBehaviour
 {
@@ -13,9 +14,9 @@ public class GameLobby : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //ClientSocket.Instance.start();
+        ClientSocket.Instance.start();
         // StartCoroutine(test_handle());
-        ThreadPool.QueueUserWorkItem(new WaitCallback(test_handle));
+        //ThreadPool.QueueUserWorkItem(new WaitCallback(test_handle));
     }
 
 
@@ -94,8 +95,16 @@ public class GameLobby : MonoBehaviour
             //ar.Set();
 
             //same with the following two sentences
-            mr.Set();
+            //mr.Set();
             //mr.Reset();
+            string aaa = "what the fuck";
+            byte[] mmm = Encoding.UTF8.GetBytes(aaa);
+            ClientSocket.Instance.sendMessageToGame(mmm);
+            print("send data now");
+        }
+        if(GUILayout.Button("close"))
+        {
+            ClientSocket.Instance.stop();
         }
     }
     #endregion

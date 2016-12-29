@@ -48,15 +48,14 @@ public class SocketSendStateObject
 
 public class ClientSocket
 {
-
+    Queue _sendDataQueue;
     CircleBuffer m_receiveCB;
     CircleBuffer m_sendCB;
     AutoResetEvent _receiveEvent;
     AutoResetEvent _sendEvent;
+    ManualResetEvent _stopEvent;
     Socket m_clientSocket;
     Socket m_serverSocket;
-    Thread m_receiveThr;
-    Thread m_sendThr;
     ReaderWriterLock _receiveLock;
 
     private static ClientSocket _instance;
@@ -79,70 +78,70 @@ public class ClientSocket
 
     public void start()
     {
+        _receiveEvent = new AutoResetEvent(false);
+        _sendEvent = new AutoResetEvent(false);
+        _stopEvent = new ManualResetEvent(false);
         m_clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         m_clientSocket.Connect(new IPEndPoint(IPAddress.Parse("192.168.0.103"), 8830));
         GlobalLog.v("connect success");
-        SocketReadStateObject so = new SocketReadStateObject(m_clientSocket);
-        m_receiveThr = new Thread(receiveThreading);
-        m_receiveThr.Start(so);
         m_receiveCB = new CircleBuffer();
-        _receiveEvent = new AutoResetEvent(false);
+        _sendDataQueue = new Queue();
 
-        //m_clientSocket.Send(BitConverter.GetBytes("fuck you now"));
-        
-        //m_sendThr = new Thread(sendThreading);
-        //_sendEvent = new AutoResetEvent(false);
+        ThreadPool.QueueUserWorkItem(new WaitCallback(receiveThreading));
+        ThreadPool.QueueUserWorkItem(new WaitCallback(sendThreading));
     }
 
     public void stop()
     {
+        _stopEvent.Set();
         if (m_clientSocket != null)
         {
             m_clientSocket.Close(0);
         }
-        if (m_receiveThr != null)
-        {
-            m_receiveThr.Abort();
-            m_receiveThr = null;
-        }
     }
 
-    private void receiveThreading(System.Object obj)
+    public void sendMessageToGame(byte[] msg)
+    {
+        _sendDataQueue.Enqueue(msg);
+        _sendEvent.Set();
+    }
+
+    private void receiveThreading(System.Object o)
     {
         GlobalLog.v("enter receive threading");
-        SocketReadStateObject so = (SocketReadStateObject)obj;
-        Socket soc = so.WorkSocket;
         while (true)
         {
             try
             {
-                soc.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(callback), so);
-                //soc.Receive(so._buffer);
-                _receiveEvent.WaitOne();
-                _receiveEvent.Reset();
+                WaitHandle[] handles = new WaitHandle[1];
+                handles[0] = _stopEvent;
+                SocketReadStateObject so = new SocketReadStateObject(m_clientSocket);
+                m_clientSocket.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(receiveCallback), so);
+                if(WaitHandle.WaitAny(handles) == 0)
+                {
+                    //_stopEvent
+                    break;
+                }
             }
             catch (Exception e)
             {
                 GlobalLog.v(e.ToString());
-                soc.Shutdown(SocketShutdown.Both);
-                soc.Close();
-                soc = null;
+                m_clientSocket.Shutdown(SocketShutdown.Both);
+                m_clientSocket.Close();
+                m_clientSocket = null;
                 break;
             }
         }
     }
 
-    
-
-
-    private void callback(System.IAsyncResult ar)
+    private void receiveCallback(System.IAsyncResult ar)
     {
         SocketReadStateObject so = (SocketReadStateObject)ar.AsyncState;
         Socket soc = so.WorkSocket;
         int n = soc.EndReceive(ar);
         if (n > 0)
         {
-             m_receiveCB.appendData(so._buffer, n);
+            m_receiveCB.appendData(so._buffer, n);
             if (m_receiveCB.getLength() > 4)
             {
                 //byte[] bytesize = null;
@@ -163,23 +162,44 @@ public class ClientSocket
                 }
             }
         }
-        soc.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(callback), so);
-        //
-        //_receiveEvent.Set();
+        soc.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(receiveCallback), so);
     }
 
-    private void sendThreading(System.Object obj)
+    private void sendThreading(System.Object o)
     {
+        Queue workQueue = new Queue();
         GlobalLog.v("enter send threading");
-        SocketReadStateObject so = (SocketReadStateObject)obj;
-        Socket soc = so.WorkSocket;
         while (true)
         {
             try
             {
-                soc.BeginSend(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(sendCallback), so);
-                _sendEvent.WaitOne();
-                _sendEvent.Reset();
+                workQueue.Clear();
+                WaitHandle[] handles = new WaitHandle[2];
+                handles[0] = _stopEvent;
+                handles[1] = _sendEvent;
+                if (WaitHandle.WaitAny(handles) == 0)
+                {
+                    //_stopEvent
+                    break;
+                }
+                else
+                {
+                    //_sendLock.AcquireWriterLock(-1);
+                    foreach (byte[] item in _sendDataQueue)
+                    {
+                        SocketSendStateObject so = new SocketSendStateObject(m_clientSocket, item);
+                        workQueue.Enqueue(so);
+                    }
+                    _sendDataQueue.Clear();
+                    //_sendLock.ReleaseWriterLock();
+                    if (workQueue != null)
+                    {
+                        foreach (SocketSendStateObject item in workQueue)
+                        {
+                            m_clientSocket.BeginSend(item._buffer, 0, item._buffer.Length, 0, new AsyncCallback(sendCallback), item);
+                        }
+                    }
+                }
             }
             catch (System.Exception ex)
             {
@@ -212,9 +232,7 @@ public class ClientSocket
         }
         catch (Exception ex)
         {
-//            _errCode = ESessionError.ERR_SEND_END_EXCEPTION;
-  //          _errMessage = ex.Message;
-           // Close();
+            stop();
         }
     }
 }
