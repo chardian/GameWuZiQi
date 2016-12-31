@@ -72,8 +72,15 @@ namespace qi
       get { return _proID; }
       set { _proID = value; }
     }
+    private Result _ret;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"ret", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public Result ret
+    {
+      get { return _ret; }
+      set { _ret = value; }
+    }
     private int _id;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public int id
     {
       get { return _id; }
@@ -135,6 +142,13 @@ namespace qi
       get { return _proID; }
       set { _proID = value; }
     }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -153,8 +167,15 @@ namespace qi
       get { return _proID; }
       set { _proID = value; }
     }
+    private Result _ret;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"ret", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public Result ret
+    {
+      get { return _ret; }
+      set { _ret = value; }
+    }
     private readonly global::System.Collections.Generic.List<Room> _rooms = new global::System.Collections.Generic.List<Room>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"rooms", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(3, Name=@"rooms", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<Room> rooms
     {
       get { return _rooms; }
@@ -178,8 +199,15 @@ namespace qi
       get { return _proID; }
       set { _proID = value; }
     }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
+    }
     private int _roomID;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"roomID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"roomID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public int roomID
     {
       get { return _roomID; }
@@ -235,6 +263,20 @@ namespace qi
       get { return _proID; }
       set { _proID = value; }
     }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
+    }
+    private int _roomID;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"roomID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int roomID
+    {
+      get { return _roomID; }
+      set { _roomID = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -259,6 +301,120 @@ namespace qi
     {
       get { return _ret; }
       set { _ret = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ChessReq")]
+  public partial class ChessReq : global::ProtoBuf.IExtensible
+  {
+    public ChessReq() {}
+    
+    private int _proID = (int)10008;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"proID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue((int)10008)]
+    public int proID
+    {
+      get { return _proID; }
+      set { _proID = value; }
+    }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
+    }
+    private int _x;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"x", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int x
+    {
+      get { return _x; }
+      set { _x = value; }
+    }
+    private int _y;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"y", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int y
+    {
+      get { return _y; }
+      set { _y = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ChessAck")]
+  public partial class ChessAck : global::ProtoBuf.IExtensible
+  {
+    public ChessAck() {}
+    
+    private int _proID = (int)10009;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"proID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue((int)10009)]
+    public int proID
+    {
+      get { return _proID; }
+      set { _proID = value; }
+    }
+    private Result _ret;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"ret", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public Result ret
+    {
+      get { return _ret; }
+      set { _ret = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"GameStartAck")]
+  public partial class GameStartAck : global::ProtoBuf.IExtensible
+  {
+    public GameStartAck() {}
+    
+    private int _proID = (int)10010;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"proID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue((int)10010)]
+    public int proID
+    {
+      get { return _proID; }
+      set { _proID = value; }
+    }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"GameOverAck")]
+  public partial class GameOverAck : global::ProtoBuf.IExtensible
+  {
+    public GameOverAck() {}
+    
+    private int _proID = (int)10011;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"proID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue((int)10011)]
+    public int proID
+    {
+      get { return _proID; }
+      set { _proID = value; }
+    }
+    private int _userID;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"userID", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int userID
+    {
+      get { return _userID; }
+      set { _userID = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -302,7 +458,19 @@ namespace qi
       __PrepareGameReq = 10006,
             
       [global::ProtoBuf.ProtoEnum(Name=@"__PrepareGameAck", Value=10007)]
-      __PrepareGameAck = 10007
+      __PrepareGameAck = 10007,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"__ChessReq", Value=10008)]
+      __ChessReq = 10008,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"__ChessAck", Value=10009)]
+      __ChessAck = 10009,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"__GameStartAck", Value=10010)]
+      __GameStartAck = 10010,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"__GameOverAck", Value=10011)]
+      __GameOverAck = 10011
     }
   
 }

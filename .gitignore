@@ -4,3 +4,7 @@ Assets/NGUI/*
 Assets/Scripts/google/*
 Assets/UnityVS/*
 Assets/config/*
+/UnityVS.FiveQi.CSharp.Editor.csproj
+/UnityVS.FiveQi.CSharp.csproj
+/UnityVS.FiveQi.sln
+/.vs/UnityVS.FiveQi/v14/*.suo

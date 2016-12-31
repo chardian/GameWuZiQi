@@ -1,0 +1,100 @@
+message RoomUser {
+	required string name = 1;
+	required int32 state = 2;
+}
+
+message LoginReq {
+	optional int32 proID = 1[default = 10000];
+	required string name = 2;
+}
+
+message LoginAck {
+	optional int32 proID = 1[default = 10001];
+	required Result ret = 2;
+	required int32 id = 3;
+}
+
+message Room {
+	required int32 roomID = 1;
+	required int32 count = 2;
+	required int32 max = 3;
+	required string roomName = 4;
+}
+
+enum Result {
+	Success = 1;
+	Error = 2;
+}
+
+message GetRoomReq {
+	optional int32 proID = 1[default = 10002];
+	required int32 userID = 2;
+}
+
+message GetRoomAck {
+	optional int32 proID = 1[default = 10003];
+	required Result ret = 2;
+	repeated Room rooms = 3;
+}
+
+message EnterRoomReq {
+	optional int32 proID = 1[default = 10004];
+	required int32 userID = 2;
+	required int32 roomID = 3;
+}
+
+message EnterRoomAck {
+	optional int32 proID = 1[default = 10005];
+	required Result ret = 2;
+	repeated RoomUser users = 3;
+}
+
+message PrepareGameReq {
+	optional int32 proID = 1[default = 10006];
+	required int32 userID = 2;
+	required int32 roomID = 3;
+}
+
+message PrepareGameAck {
+	optional int32 proID = 1[default = 10007];
+	required Result ret = 2;
+}
+
+message ChessReq {
+	optional int32 proID = 1[default = 10008];
+	required int32 userID = 2;
+	required int32 x = 3;
+	required int32 y = 4;
+}
+
+message ChessAck {
+	optional int32 proID = 1[default = 10009];
+	required Result ret = 2;
+}
+
+message GameStartAck {
+	optional int32 proID = 1[default = 10010];
+	required int32 userID = 2;
+}
+
+message GameOverAck {
+	optional int32 proID = 1[default = 10011];
+	required int32 userID = 2;
+}
+
+
+enum PROTOCOL{
+	__LoginReq = 10000;
+	__LoginAck = 10001;
+	__GetRoomReq = 10002;
+	__GetRoomAck = 10003;
+	__EnterRoomReq = 10004;
+	__EnterRoomAck = 10005;
+	__PrepareGameReq = 10006;
+	__PrepareGameAck = 10007;
+	__ChessReq = 10008;
+	__ChessAck = 10009;
+	__GameStartAck = 10010;
+	__GameOverAck = 10011;
+}
+

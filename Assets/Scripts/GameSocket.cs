@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System;
 using System.Text;
 
+//网络层的数据
 public class SocketReadStateObject
 {
     private Socket _workSocket;
@@ -46,7 +48,7 @@ public class SocketSendStateObject
     }
 }
 
-public class ClientSocket
+public class GameSocket
 {
     Queue _sendDataQueue;
     CircleBuffer m_receiveCB;
@@ -57,27 +59,29 @@ public class ClientSocket
     Socket m_clientSocket;
     Socket m_serverSocket;
     ReaderWriterLock _receiveLock;
+    Dictionary<int, Action<Byte[]>> CallBackMap;
 
-    private static ClientSocket _instance;
-    public static ClientSocket Instance
+    private static GameSocket _instance;
+    public static GameSocket Instance
     {
         get
         {
             if (_instance == null)
             {
-                _instance = new ClientSocket();
+                _instance = new GameSocket();
             }
             return _instance;
         }
     }
 
-    private ClientSocket()
+    private GameSocket()
     {
 
     }
 
     public void start()
     {
+        initCallBackMap();
         _receiveEvent = new AutoResetEvent(false);
         _sendEvent = new AutoResetEvent(false);
         _stopEvent = new ManualResetEvent(false);
@@ -89,6 +93,12 @@ public class ClientSocket
 
         ThreadPool.QueueUserWorkItem(new WaitCallback(receiveThreading));
         ThreadPool.QueueUserWorkItem(new WaitCallback(sendThreading));
+    }
+
+    private void initCallBackMap()
+    {
+        CallBackMap = new Dictionary<int, Action<byte[]>>();
+
     }
 
     public void stop()
@@ -159,6 +169,13 @@ public class ClientSocket
                 {
                     m_receiveCB.moveNext(contentsize);
                     //get data
+                    int length = m_receiveCB.readInt();
+                    if(length > 8)
+                    {
+                        m_receiveCB.moveNext(sizeof(int));
+                        int proid = m_receiveCB.readInt();
+
+                    }
                 }
             }
         }

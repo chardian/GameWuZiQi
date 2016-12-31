@@ -1,35 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.Text;
+using qi;
+using System.IO;
+using ProtoBuf;
+using System;
 
 public class GameLobby : MonoBehaviour
 {
+    public UILabel lbl_userName;
+    public UIButton btn_login;
+
     Socket m_socket;
     const string IP = "192.168.0.103";
     const int PORT = 8830;
     // Use this for initialization
     void Start()
     {
-        ClientSocket.Instance.start();
+        GameSocket.Instance.start();
         // StartCoroutine(test_handle());
         //ThreadPool.QueueUserWorkItem(new WaitCallback(test_handle));
+        EventDelegate.Add(btn_login.onClick, onLogin);
     }
 
-
-
-    void receive()
+    void onLogin()
     {
-
+        if (string.IsNullOrEmpty(lbl_userName.text) == false)
+        {
+            LoginReq req = new LoginReq() { name = lbl_userName.text };
+            send(req.proID, req);
+//             MemoryStream ms = new MemoryStream();//default length is 256
+//             Serializer.Serialize(ms, req);
+//             byte[] arr = ms.GetBuffer();
+//             int len = arr.Length;
+//             byte[] lenBytes = BitConverter.GetBytes(len);
+//             ClientSocket.Instance.sendMessageToGame(ms.GetBuffer());
+        }
     }
 
-    void send()
+    void send(int protoid, object oo)
     {
-
+        //byte[] data = ms.GetBuffer();
+        //int len = data.Length;
+        using (MemoryStream ret = new MemoryStream())
+        {
+            BinaryWriter bw = new BinaryWriter(ret);
+            bw.Write(0);
+            bw.Write(protoid);
+            Serializer.Serialize(ret, oo);
+            int len = (int)ret.Length - 8;
+            ret.Position = 0;
+            bw.Write(len);
+            GameSocket.Instance.sendMessageToGame(ret.ToArray());
+            //解析数据看看了
+            /*
+            byte[] data = ret.ToArray();
+            ret.Position = 0;
+            BinaryReader br = new BinaryReader(ret);
+            print("size is : " + br.ReadInt32());
+            MemoryStream mm = new MemoryStream(data, 4, data.Length - 4);
+            LoginReq req = Serializer.Deserialize<LoginReq>(mm);
+            print(req.proID + "," + req.name);
+            */
+        }
     }
+    /*
     #region test
     void test()
     {
@@ -81,7 +119,7 @@ public class GameLobby : MonoBehaviour
 
             }
             i++;
-            if(i > 100)
+            if (i > 100)
             {
                 break;
             }
@@ -102,10 +140,11 @@ public class GameLobby : MonoBehaviour
             ClientSocket.Instance.sendMessageToGame(mmm);
             print("send data now");
         }
-        if(GUILayout.Button("close"))
+        if (GUILayout.Button("close"))
         {
             ClientSocket.Instance.stop();
         }
     }
     #endregion
+    */
 }
