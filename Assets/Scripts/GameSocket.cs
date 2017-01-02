@@ -6,6 +6,9 @@ using System.Net;
 using System.Threading;
 using System;
 using System.Text;
+using qi;
+using System.IO;
+using ProtoBuf;
 
 //网络层的数据
 public class SocketReadStateObject
@@ -103,14 +106,36 @@ public class GameSocket
 
     public void stop()
     {
+        //关闭线程
         _stopEvent.Set();
         if (m_clientSocket != null)
         {
+            Debug.Log("========== close socket now");
             m_clientSocket.Close(0);
         }
     }
 
-    public void sendMessageToGame(byte[] msg)
+    /// <summary>
+    /// 发送数据
+    /// </summary>
+    /// <param name="protoid"></param>
+    /// <param name="oo"></param>
+    public void send(int protoid, object oo)
+    {
+        using (MemoryStream ret = new MemoryStream())
+        {
+            BinaryWriter bw = new BinaryWriter(ret);
+            bw.Write(0);
+            bw.Write(protoid);
+            Serializer.Serialize(ret, oo);
+            int len = (int)ret.Length - 8;
+            ret.Position = 0;
+            bw.Write(len);
+            sendMessageToGame(ret.ToArray());
+        }
+    }
+
+    private void sendMessageToGame(byte[] msg)
     {
         _sendDataQueue.Enqueue(msg);
         _sendEvent.Set();
@@ -127,7 +152,7 @@ public class GameSocket
                 handles[0] = _stopEvent;
                 SocketReadStateObject so = new SocketReadStateObject(m_clientSocket);
                 m_clientSocket.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(receiveCallback), so);
-                if(WaitHandle.WaitAny(handles) == 0)
+                if (WaitHandle.WaitAny(handles) == 0)
                 {
                     //_stopEvent
                     break;
@@ -149,10 +174,29 @@ public class GameSocket
         SocketReadStateObject so = (SocketReadStateObject)ar.AsyncState;
         Socket soc = so.WorkSocket;
         int n = soc.EndReceive(ar);
-        if (n > 0)
+        if (n > 8)
         {
+            //足够读取一个INT类型的参数的时候。
             m_receiveCB.appendData(so._buffer, n);
-            if (m_receiveCB.getLength() > 4)
+            int msgSize = m_receiveCB.readInt();
+            m_receiveCB.moveNext(sizeof(int));
+            int msgID = m_receiveCB.readInt();
+            m_receiveCB.moveNext(sizeof(int));
+            if (msgSize > 0)
+            {
+                //读取下一个数据包的长度。
+                byte[] data = m_receiveCB.getBytes(msgSize);
+                GameNetLogic.Instance.OnReceiveData(msgID, data);
+
+                /*MemoryStream mm = new MemoryStream(data);
+                LoginAck ack = Serializer.Deserialize<LoginAck>(mm);
+                Debug.Log("ack is" + ack.id + "," + ack.ret);*/
+            }
+
+
+
+
+            /*if (m_receiveCB.getLength() > 4)
             {
                 //byte[] bytesize = null;
                 //byte[] bytecontent = null;
@@ -177,7 +221,7 @@ public class GameSocket
 
                     }
                 }
-            }
+            }*/
         }
         soc.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(receiveCallback), so);
     }
