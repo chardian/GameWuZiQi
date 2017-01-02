@@ -12,12 +12,13 @@ using PureMVC.Core;
 using PureMVC.Interfaces;
 using System.Collections.Generic;
 
-public class GameLobby : MonoBehaviour, IMediator
+public class PanelLobby : MonoBehaviour, IMediator
 {
     public UILabel lbl_userName;
     public UIButton btn_login;
     public GameObject go_login;
     public UIGrid grid_rooms;
+    public GameObject prefab_room;
     // Use this for initialization
     void Start()
     {
@@ -76,13 +77,13 @@ public class GameLobby : MonoBehaviour, IMediator
         }
         else if (notification.Name == GameFacade.ON_GET_ROOM)
         {
+            //go_login.SetActive(false);
             GetRoomAck ack = (GetRoomAck)(notification.Body);
-            GameObject prefab = Resources.Load("PanelRoom") as GameObject;
 
             int length = ack.rooms.Count;
             for (int i = 0; i < length; i++)
             {
-                GameObject go = Instantiate(prefab) as GameObject;
+                GameObject go = Instantiate(prefab_room) as GameObject;
                 go.transform.parent = grid_rooms.transform;
                 go.transform.localScale = Vector3.one;
                 go.transform.localPosition = Vector3.zero;

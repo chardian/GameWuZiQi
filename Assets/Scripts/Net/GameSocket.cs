@@ -174,7 +174,7 @@ public class GameSocket
         SocketReadStateObject so = (SocketReadStateObject)ar.AsyncState;
         Socket soc = so.WorkSocket;
         int n = soc.EndReceive(ar);
-        if (n > 8)
+        if (n > 8)//一个是包的长度， 一个是包的ID类型。
         {
             //足够读取一个INT类型的参数的时候。
             m_receiveCB.appendData(so._buffer, n);
@@ -187,41 +187,7 @@ public class GameSocket
                 //读取下一个数据包的长度。
                 byte[] data = m_receiveCB.getBytes(msgSize);
                 GameNetLogic.Instance.OnReceiveData(msgID, data);
-
-                /*MemoryStream mm = new MemoryStream(data);
-                LoginAck ack = Serializer.Deserialize<LoginAck>(mm);
-                Debug.Log("ack is" + ack.id + "," + ack.ret);*/
             }
-
-
-
-
-            /*if (m_receiveCB.getLength() > 4)
-            {
-                //byte[] bytesize = null;
-                //byte[] bytecontent = null;
-                //bytesize = new byte[4];
-                //m_receiveCB.ReadData(ref bytesize, 0);
-                int contentsize = m_receiveCB.readInt();
-                contentsize += 4;
-                if (m_receiveCB.getLength() < contentsize)
-                {
-                    //没有接收完整
-                    Console.WriteLine("没有接收完整");
-                }
-                else
-                {
-                    m_receiveCB.moveNext(contentsize);
-                    //get data
-                    int length = m_receiveCB.readInt();
-                    if(length > 8)
-                    {
-                        m_receiveCB.moveNext(sizeof(int));
-                        int proid = m_receiveCB.readInt();
-
-                    }
-                }
-            }*/
         }
         soc.BeginReceive(so._buffer, 0, SocketReadStateObject.BUFFER_SIZE, 0, new AsyncCallback(receiveCallback), so);
     }
